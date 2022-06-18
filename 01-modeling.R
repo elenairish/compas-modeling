@@ -51,24 +51,24 @@ compas_data_rov %>%
   ggplot(aes(x = age,
              y = DecileScore)) +
   geom_point() +
-  stat_smooth() +  # 95% C.I.
+  stat_smooth(color='dodgerblue') +  # 95% C.I.
   labs(title = "Risk of Violence predicted by COMPAS",
        caption = "Data acquired by ProPublic (2016)",
        x = "Age",
        y = "Risk of Violence Decile Score")
-ggsave("ROV_age_scatter.png")
+ggsave("ROV_age_scatter_ave.png")
 
 # plot raw data as a scatter plot, with linear regression line
 compas_data_rov %>%
   ggplot(aes(x = age,
              y = DecileScore)) +
-  geom_smooth(method="lm", se=FALSE, color='orange', ) +
   geom_point() +
+  geom_smooth(method="lm", color='dodgerblue') +
   labs(title = "Risk of Violence predicted by COMPAS",
        caption = "Data acquired by ProPublic (2016)",
        x = "Age",
        y = "Risk of Violence Decile Score")
-ggsave("ROV_age_scatter2.png")
+ggsave("ROV_age_scatter_regr.png")
 
 # create new column with age range as categorical variable
 compas_data_rov$age_groups = cut(compas_data_rov$age, breaks=c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100))
@@ -76,7 +76,7 @@ compas_data_rov$age_groups = cut(compas_data_rov$age, breaks=c(10, 20, 30, 40, 5
 # plot risk of violence score distribution by age
 compas_data_rov %>%
   ggplot(aes(x = DecileScore)) +
-  geom_bar() +
+  geom_bar(fill='dodgerblue') +
   facet_wrap(~age_groups) +
   labs(title = "Risk of Violence predicted by COMPAS",
        subtitle = "Score distribution by age group",
@@ -84,3 +84,6 @@ compas_data_rov %>%
        x = "Risk of Violence Decile Score",
        y = "Frequency")
 ggsave("ROV_freq_age.png")
+
+# save dataframe as csv
+write.csv(compas_data_rov,"compas_data_edited.csv", row.names = FALSE)
