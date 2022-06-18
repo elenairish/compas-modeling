@@ -1,6 +1,5 @@
 # load libraries
 library(tidyverse)
-#library(lubridate)
 library(effects)
 
 # read in data
@@ -31,7 +30,7 @@ age_rov_model <- lm(DecileScore ~ age,
 effects_df <- effect("age", age_rov_model, xlevels=8) %>%
   data.frame()
 
-# plot effects
+# plot effects + linear regression
 effects_df %>%
   ggplot(aes(x = age,
              y = fit,
@@ -39,26 +38,42 @@ effects_df %>%
              ymax = upper,
              label = round(fit, digits=2))) +
   geom_errorbar() +
-  geom_label() +
+  geom_label(nudge_y = 0.5) +
   labs(title = "Risk of Violence predicted by COMPAS",
        subtitle = "Linear regression results -- score ~ age",
        caption = "Data acquired by ProPublic (2016)",
        x = "Age",
        y = "Risk of Violence Decile Score")
+ggsave("ROV_age_regression.png")
 
+# plot raw data as a scatter plot, with moving average
 compas_data_rov %>%
   ggplot(aes(x = age,
              y = DecileScore)) +
+  geom_point() +
+  stat_smooth() +  # 95% C.I.
+  labs(title = "Risk of Violence predicted by COMPAS",
+       caption = "Data acquired by ProPublic (2016)",
+       x = "Age",
+       y = "Risk of Violence Decile Score")
+ggsave("ROV_age_scatter.png")
+
+# plot raw data as a scatter plot, with linear regression line
+compas_data_rov %>%
+  ggplot(aes(x = age,
+             y = DecileScore)) +
+  geom_smooth(method="lm", se=FALSE, color='orange', ) +
   geom_point() +
   labs(title = "Risk of Violence predicted by COMPAS",
        caption = "Data acquired by ProPublic (2016)",
        x = "Age",
        y = "Risk of Violence Decile Score")
+ggsave("ROV_age_scatter2.png")
 
 # create new column with age range as categorical variable
 compas_data_rov$age_groups = cut(compas_data_rov$age, breaks=c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100))
 
-# plot risk of violence scores by age
+# plot risk of violence score distribution by age
 compas_data_rov %>%
   ggplot(aes(x = DecileScore)) +
   geom_bar() +
@@ -68,9 +83,4 @@ compas_data_rov %>%
        caption = "Data acquired by ProPublic (2016)",
        x = "Risk of Violence Decile Score",
        y = "Frequency")
-
-
-
-
-
-
+ggsave("ROV_freq_age.png")
